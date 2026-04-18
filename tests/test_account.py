@@ -97,27 +97,27 @@ class TestLogin:
         remember_cookies = [c for c in cookies if 'remember_token' in c]
         assert len(remember_cookies) > 0
 
-    def test_login_already_authenticated(self, client, user_factory):
+    def test_login_already_authenticated(self, account_client, user_factory):
         """Test login when already authenticated."""
         user = user_factory(password='password123')
 
         # First login
-        client.post(url_for('account.login'), data={
+        account_client.post(url_for('account.login'), data={
             'username': user.username,
             'password': 'password123'
         })
 
         # Try to access login page again
-        response = client.get(url_for('account.login'), follow_redirects=True)
+        response = account_client.get(url_for('account.login'), follow_redirects=True)
         assert response.status_code == 200
         # Should redirect to index
         assert b'index' in response.data.lower() or b'home' in response.data.lower()
 
-    def test_login_next_parameter(self, client, user_factory):
+    def test_login_next_parameter(self, account_client, user_factory):
         """Test login with next parameter."""
         user = user_factory(password='password123')
 
-        response = client.post(
+        response = account_client.post(
             url_for('account.login', next='/profile'),
             data={
                 'username': user.username,
