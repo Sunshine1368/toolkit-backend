@@ -12,11 +12,11 @@ class TestLogin:
         assert response.status_code == 200
         assert b'Login' in response.data or b'Sign In' in response.data
 
-    def test_login_success(self, client, user_factory):
+    def test_login_success(self, account_client, user_factory):
         """Test successful login."""
         user = user_factory(password='password123')
 
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': user.username,
             'password': 'password123',
             'remember': False
@@ -26,9 +26,9 @@ class TestLogin:
         # Should redirect to index
         assert url_for('www.index') in response.location
 
-        # Verify user is logged in by accessing protected page
-        with client.session_transaction() as session:
-            assert 'user_id' in session
+        # Verify user is logged in by checking cookies
+        cookies = response.headers.getlist('Set-Cookie')
+        assert any('remember_token' in cookie for cookie in cookies)
 
     def test_login_with_email(self, client, user_factory):
         """Test login with email instead of username."""
@@ -609,7 +609,7 @@ class TestOAuth:
 
     @patch('requests.post')
     @patch('requests.get')
-    def test_oauth_github_callback_existing_user(self, mock_get, mock_post, app, client, session, user_factory):
+    def test_oauth_github_callback_existing_user(self, mock_get, mock_post, app, client, db, user_factory):
         """Test GitHub OAuth callback for existing user."""
         # Create user with existing OAuth connection
         user = user_factory()

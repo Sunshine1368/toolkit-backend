@@ -68,6 +68,9 @@ class TestingConfig(Config):
         'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
     SERVER_NAME = 'localhost'
+    # Use filesystem session for testing instead of redis
+    SESSION_TYPE = 'filesystem'
+    SESSION_FILE_DIR = '/tmp/flask_session_test'
 
 
 class ProductionConfig(Config):

@@ -79,6 +79,79 @@ def app_context_for_forms(app):
     # For now, we'll let tests manage their own contexts
     pass
 
+
+# Helper for subdomain testing
+@pytest.fixture
+def subdomain_client(app, client):
+    """Return a function that creates a test client with subdomain header."""
+    def make_client(subdomain='www'):
+        class SubdomainClient:
+            def __init__(self, client, subdomain):
+                self.client = client
+                self.subdomain = subdomain
+
+            def _add_host_header(self, kwargs):
+                if 'headers' not in kwargs:
+                    kwargs['headers'] = {}
+                if 'Host' not in kwargs['headers']:
+                    kwargs['headers']['Host'] = f'{self.subdomain}.localhost'
+                return kwargs
+
+            def get(self, *args, **kwargs):
+                kwargs = self._add_host_header(kwargs)
+                return self.client.get(*args, **kwargs)
+
+            def post(self, *args, **kwargs):
+                kwargs = self._add_host_header(kwargs)
+                return self.client.post(*args, **kwargs)
+
+            def put(self, *args, **kwargs):
+                kwargs = self._add_host_header(kwargs)
+                return self.client.put(*args, **kwargs)
+
+            def delete(self, *args, **kwargs):
+                kwargs = self._add_host_header(kwargs)
+                return self.client.delete(*args, **kwargs)
+
+            def session_transaction(self, *args, **kwargs):
+                return self.client.session_transaction(*args, **kwargs)
+
+        return SubdomainClient(client, subdomain)
+
+    return make_client
+
+
+# Pre-configured clients for each subdomain
+@pytest.fixture
+def account_client(subdomain_client):
+    """Client for account subdomain."""
+    return subdomain_client('account')
+
+@pytest.fixture
+def settings_client(subdomain_client):
+    """Client for settings subdomain."""
+    return subdomain_client('settings')
+
+@pytest.fixture
+def notice_client(subdomain_client):
+    """Client for notice subdomain."""
+    return subdomain_client('notice')
+
+@pytest.fixture
+def contacts_client(subdomain_client):
+    """Client for contacts subdomain."""
+    return subdomain_client('contacts')
+
+@pytest.fixture
+def chat_client(subdomain_client):
+    """Client for chat subdomain."""
+    return subdomain_client('chat')
+
+@pytest.fixture
+def www_client(subdomain_client):
+    """Client for www subdomain."""
+    return subdomain_client('www')
+
 # Model factories
 @pytest.fixture
 def user_factory(db):
