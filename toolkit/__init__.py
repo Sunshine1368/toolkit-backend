@@ -129,9 +129,12 @@ def register_commands(app):
 
 def register_context_processors(app):
     """Register context processors."""
+    import datetime
+
     @app.context_processor
     def inject_global_variables():
         from flask import request
         return {
-            'current_subdomain': request.host.split('.')[0] if '.' in request.host else 'www'
+            'current_subdomain': request.host.split('.')[0] if '.' in request.host else 'www',
+            'now': datetime.datetime.utcnow()
         }

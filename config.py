@@ -65,13 +65,15 @@ class TestingConfig(Config):
     """Testing configuration."""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-        'mysql+pymysql://root:password@localhost:3306/toolkit_test'
+        'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
+    SERVER_NAME = 'localhost'
 
 
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
+    TESTING = False
 
     @staticmethod
     def init_app(app):
