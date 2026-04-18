@@ -30,11 +30,11 @@ class TestLogin:
         cookies = response.headers.getlist('Set-Cookie')
         assert any('remember_token' in cookie for cookie in cookies)
 
-    def test_login_with_email(self, client, user_factory):
+    def test_login_with_email(self, account_client, user_factory):
         """Test login with email instead of username."""
         user = user_factory(password='password123')
 
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': user.email,
             'password': 'password123',
             'remember': False
