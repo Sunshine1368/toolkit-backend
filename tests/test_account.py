@@ -43,9 +43,9 @@ class TestLogin:
         assert response.status_code == 302
         assert url_for('www.index') in response.location
 
-    def test_login_invalid_username(self, client):
+    def test_login_invalid_username(self, account_client):
         """Test login with invalid username."""
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': 'nonexistent',
             'password': 'password',
             'remember': False
@@ -55,11 +55,11 @@ class TestLogin:
         # Should show error message
         assert b'Invalid username or password' in response.data
 
-    def test_login_invalid_password(self, client, user_factory):
+    def test_login_invalid_password(self, account_client, user_factory):
         """Test login with invalid password."""
         user = user_factory(password='correctpassword')
 
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': user.username,
             'password': 'wrongpassword',
             'remember': False
@@ -68,11 +68,11 @@ class TestLogin:
         assert response.status_code == 200
         assert b'Invalid username or password' in response.data
 
-    def test_login_inactive_account(self, client, user_factory):
+    def test_login_inactive_account(self, account_client, user_factory):
         """Test login with inactive account."""
         user = user_factory(password='password123', is_active=False)
 
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': user.username,
             'password': 'password123',
             'remember': False
@@ -81,11 +81,11 @@ class TestLogin:
         assert response.status_code == 200
         assert b'Account is disabled' in response.data
 
-    def test_login_remember_me(self, client, user_factory):
+    def test_login_remember_me(self, account_client, user_factory):
         """Test login with remember me checked."""
         user = user_factory(password='password123')
 
-        response = client.post(url_for('account.login'), data={
+        response = account_client.post(url_for('account.login'), data={
             'username': user.username,
             'password': 'password123',
             'remember': True
@@ -93,7 +93,7 @@ class TestLogin:
 
         assert response.status_code == 302
         # Check if remember cookie is set
-        cookies = response.headers.get_all('Set-Cookie')
+        cookies = response.headers.getlist('Set-Cookie')
         remember_cookies = [c for c in cookies if 'remember_token' in c]
         assert len(remember_cookies) > 0
 
