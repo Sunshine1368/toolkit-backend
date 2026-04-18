@@ -27,8 +27,6 @@ def send_email(to, subject, body):
 
 
 # GitHub OAuth Configuration
-GITHUB_CLIENT_ID = current_app.config.get('GITHUB_CLIENT_ID', '')
-GITHUB_CLIENT_SECRET = current_app.config.get('GITHUB_CLIENT_SECRET', '')
 GITHUB_AUTHORIZE_URL = 'https://github.com/login/oauth/authorize'
 GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 GITHUB_USER_API = 'https://api.github.com/user'
@@ -298,7 +296,7 @@ def oauth_github():
         state = 'login'
 
     params = {
-        'client_id': GITHUB_CLIENT_ID,
+        'client_id': current_app.config.get('GITHUB_CLIENT_ID', ''),
         'redirect_uri': url_for('account.oauth_github_callback', _external=True),
         'scope': 'user:email',
         'state': state,
@@ -324,8 +322,8 @@ def oauth_github_callback():
         GITHUB_TOKEN_URL,
         headers={'Accept': 'application/json'},
         data={
-            'client_id': GITHUB_CLIENT_ID,
-            'client_secret': GITHUB_CLIENT_SECRET,
+            'client_id': current_app.config.get('GITHUB_CLIENT_ID', ''),
+            'client_secret': current_app.config.get('GITHUB_CLIENT_SECRET', ''),
             'code': code,
             'redirect_uri': url_for('account.oauth_github_callback', _external=True)
         }

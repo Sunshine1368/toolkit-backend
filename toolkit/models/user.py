@@ -104,4 +104,4 @@ class UserSettings(db.Model):
 @login.user_loader
 def load_user(id):
     """Load user for Flask-Login."""
-    return User.query.get(int(id))
+    return db.session.get(User, int(id))
