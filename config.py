@@ -71,6 +71,11 @@ class TestingConfig(Config):
     # Use filesystem session for testing instead of redis
     SESSION_TYPE = 'filesystem'
     SESSION_FILE_DIR = '/tmp/flask_session_test'
+    # Flask-Login session protection can cause issues in tests
+    SESSION_PROTECTION = None
+    # Ensure sessions are properly handled
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = False
+    SQLALCHEMY_EXPIRE_ON_COMMIT = False
 
 
 class ProductionConfig(Config):
