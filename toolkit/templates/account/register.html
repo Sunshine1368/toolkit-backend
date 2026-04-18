@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Toolkit.uno{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Create Account</h2>
+
+        <form method="POST" action="{{ url_for('account.register') }}" class="auth-form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control", placeholder="Choose a username") }}
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", placeholder="Enter your email") }}
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control", placeholder="Create a password") }}
+                {% if form.password.errors %}
+                    {% for error in form.password.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+                <small class="form-text">Password must be at least 8 characters long.</small>
+            </div>
+
+            <div class="form-group">
+                {{ form.password2.label(class="form-label") }}
+                {{ form.password2(class="form-control", placeholder="Repeat password") }}
+                {% if form.password2.errors %}
+                    {% for error in form.password2.errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary btn-block") }}
+            </div>
+        </form>
+
+        <div class="auth-links">
+            <span>Already have an account?</span>
+            <a href="{{ url_for('account.login') }}">Sign In</a>
+        </div>
+
+        <div class="oauth-section">
+            <div class="separator">or sign up with</div>
+            <a href="{{ url_for('account.oauth_github') }}" class="btn btn-outline btn-block">
+                <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align: middle; margin-right: 8px;">
+                    <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 40px 20px;
+}
+
+.auth-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--box-shadow);
+}
+
+.auth-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.75rem;
+    color: var(--text-color);
+}
+
+.auth-form {
+    margin-bottom: 30px;
+}
+
+.auth-links {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--text-secondary);
+}
+
+.auth-links a {
+    color: var(--color-primary);
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+.separator {
+    margin: 0 10px;
+    color: var(--text-secondary);
+}
+
+.oauth-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+
+.oauth-section .separator {
+    display: block;
+    text-align: center;
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+}
+
+.form-text {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.error-message {
+    color: var(--color-danger);
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+}
+</style>
+{% endblock %}

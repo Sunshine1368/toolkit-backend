@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Toolkit.uno{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <img src="{{ current_user.avatar_url or url_for('static', filename='images/avatar-default.png') }}"
+                 alt="{{ current_user.display_name or current_user.username }}"
+                 class="avatar-large">
+            <div class="avatar-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('avatar-url').focus()">
+                    Change Avatar
+                </button>
+            </div>
+        </div>
+        <div class="profile-info">
+            <h1>{{ current_user.display_name or current_user.username }}</h1>
+            <p class="username">@{{ current_user.username }}</p>
+            <p class="email">{{ current_user.email }}</p>
+            {% if current_user.bio %}
+                <p class="bio">{{ current_user.bio }}</p>
+            {% endif %}
+            <div class="profile-stats">
+                <div class="stat">
+                    <strong>{{ current_user.contacts.count() }}</strong>
+                    <span>Contacts</span>
+                </div>
+                <div class="stat">
+                    <strong>{{ current_user.messages_received.count() }}</strong>
+                    <span>Messages</span>
+                </div>
+                <div class="stat">
+                    <strong>{{ current_user.notifications.count() }}</strong>
+                    <span>Notifications</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-card">
+            <h3>Edit Profile</h3>
+            <form method="POST" action="{{ url_for('account.profile') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    {{ form.display_name.label(class="form-label") }}
+                    {{ form.display_name(class="form-control", placeholder="Display name") }}
+                    {% if form.display_name.errors %}
+                        {% for error in form.display_name.errors %}
+                            <div class="error-message">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.bio.label(class="form-label") }}
+                    {{ form.bio(class="form-control", placeholder="Tell us about yourself", rows="3") }}
+                    {% if form.bio.errors %}
+                        {% for error in form.bio.errors %}
+                            <div class="error-message">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    <small class="form-text">Maximum 500 characters.</small>
+                </div>
+
+                <div class="form-group">
+                    {{ form.avatar_url.label(class="form-label") }}
+                    {{ form.avatar_url(class="form-control", placeholder="https://example.com/avatar.jpg", id="avatar-url") }}
+                    {% if form.avatar_url.errors %}
+                        {% for error in form.avatar_url.errors %}
+                            <div class="error-message">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    <small class="form-text">Enter a direct URL to your avatar image.</small>
+                </div>
+
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+
+        <div class="profile-actions">
+            <div class="action-card">
+                <h4>Account Security</h4>
+                <ul class="action-list">
+                    <li>
+                        <a href="{{ url_for('account.change_password') }}" class="action-link">
+                            <span class="action-icon">🔒</span>
+                            <span>Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('account.change_email') }}" class="action-link">
+                            <span class="action-icon">📧</span>
+                            <span>Change Email</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('account.oauth_connections') }}" class="action-link">
+                            <span class="action-icon">🔗</span>
+                            <span>Connected Accounts</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="action-card">
+                <h4>Account Information</h4>
+                <dl class="info-list">
+                    <dt>Member Since</dt>
+                    <dd>{{ current_user.created_at.strftime('%B %d, %Y') }}</dd>
+                    <dt>Last Login</dt>
+                    <dd>{{ current_user.last_seen.strftime('%B %d, %Y %H:%M') }}</dd>
+                    <dt>Email Verified</dt>
+                    <dd>
+                        {% if current_user.email_verified %}
+                            <span class="badge badge-success">Verified</span>
+                        {% else %}
+                            <span class="badge badge-warning">Not Verified</span>
+                            <a href="{{ url_for('account.verify_email') }}" class="btn-link">Verify Now</a>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.profile-header {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+    align-items: flex-start;
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--border-color);
+}
+
+.avatar-actions {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.username {
+    font-size: 1.125rem;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+}
+
+.email {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.bio {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--color-primary);
+}
+
+.profile-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+}
+
+.stat span {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.profile-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.profile-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.profile-card h3 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.action-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 24px;
+}
+
+.action-card h4 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.action-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.action-list li {
+    margin-bottom: 12px;
+}
+
+.action-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.action-link:hover {
+    background: var(--bg-color);
+    color: var(--color-primary);
+}
+
+.action-icon {
+    font-size: 1.25rem;
+}
+
+.info-list {
+    margin: 0;
+}
+
+.info-list dt {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-top: 12px;
+}
+
+.info-list dd {
+    color: var(--text-secondary);
+    margin-left: 0;
+    margin-bottom: 8px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.badge-success {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.badge-warning {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+}
+
+.btn-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .avatar-large {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-stats {
+        justify-content: center;
+    }
+
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

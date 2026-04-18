@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Connected Accounts - Toolkit.uno{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <h2>Connected Accounts</h2>
+        <p class="card-description">Manage your connected third-party accounts for login and data integration.</p>
+
+        <div class="connections-list">
+            {% for connection in connections %}
+            <div class="connection-item">
+                <div class="connection-info">
+                    <div class="connection-icon">
+                        {% if connection.provider == 'github' %}
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        {% else %}
+                        <span class="generic-icon">🔗</span>
+                        {% endif %}
+                    </div>
+                    <div class="connection-details">
+                        <h4>{{ connection.provider|title }}</h4>
+                        <p class="connection-meta">
+                            {% if connection.provider == 'github' and connection.profile_data.github_username %}
+                            Username: {{ connection.profile_data.github_username }}
+                            {% endif %}
+                            <br>
+                            Connected: {{ connection.created_at.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ url_for('account.oauth_unbind', provider=connection.provider) }}"
+                      onsubmit="return confirm('Are you sure you want to disconnect this account?')">
+                    <button type="submit" class="btn btn-danger">Disconnect</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔗</div>
+                <h4>No Connected Accounts</h4>
+                <p>You haven't connected any third-party accounts yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="available-connections">
+            <h3>Available Connections</h3>
+            <div class="connection-options">
+                <a href="{{ url_for('account.oauth_github') }}" class="connection-option">
+                    <div class="connection-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <div class="connection-details">
+                        <h4>GitHub</h4>
+                        <p>Connect your GitHub account for authentication</p>
+                    </div>
+                    <span class="connection-arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="security-note">
+            <h4>Security Note</h4>
+            <p>You must have at least one authentication method (password or connected account) to log in. If you remove your last authentication method, you will be prompted to set a password first.</p>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('account.profile') }}" class="btn btn-outline">Back to Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.profile-card {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 40px;
+}
+
+.profile-card h2 {
+    margin-bottom: 12px;
+    color: var(--text-color);
+    font-size: 1.75rem;
+}
+
+.card-description {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.connections-list {
+    margin-bottom: 40px;
+}
+
+.connection-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.connection-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.connection-icon {
+    flex-shrink: 0;
+}
+
+.connection-details h4 {
+    margin: 0 0 4px 0;
+    color: var(--text-color);
+    font-size: 1.125rem;
+}
+
+.connection-meta {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.btn-danger {
+    background: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
+}
+
+.btn-danger:hover {
+    background: var(--color-danger-dark);
+    border-color: var(--color-danger-dark);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: 1px dashed var(--border-color);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h4 {
+    margin: 0 0 8px 0;
+    color: var(--text-color);
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.available-connections {
+    margin-bottom: 40px;
+}
+
+.available-connections h3 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-size: 1.25rem;
+}
+
+.connection-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.connection-option {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.connection-option:hover {
+    background: var(--bg-hover);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.connection-arrow {
+    margin-left: auto;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+}
+
+.security-note {
+    padding: 20px;
+    background: rgba(var(--color-warning-rgb), 0.1);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-warning);
+    margin-bottom: 30px;
+}
+
+.security-note h4 {
+    margin: 0 0 8px 0;
+    color: var(--color-warning);
+}
+
+.security-note p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.btn-outline:hover {
+    background: var(--bg-color);
+    border-color: var(--text-secondary);
+}
+
+.generic-icon {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .profile-card {
+        padding: 30px 20px;
+    }
+
+    .connection-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .connection-info {
+        justify-content: flex-start;
+    }
+}
+</style>
+{% endblock %}

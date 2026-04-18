@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied - Toolkit.uno{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">403</div>
+    <h1 class="error-title">Access Denied</h1>
+    <p class="error-message">
+        You don't have permission to access this page. Please check your credentials
+        or contact the administrator if you believe this is an error.
+    </p>
+    <div class="error-actions">
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('account.login') }}" class="btn btn-primary">Login</a>
+        {% endif %}
+        <a href="{{ url_for('www.index') }}" class="btn btn-outline">Go to Homepage</a>
+        <a href="javascript:history.back()" class="btn btn-outline">Go Back</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+.error-container {
+    text-align: center;
+    padding: 80px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: bold;
+    color: var(--color-warning);
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.error-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.error-message {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.error-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 4rem;
+    }
+
+    .error-title {
+        font-size: 1.5rem;
+    }
+
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .error-actions .btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+</style>
+{% endblock %}

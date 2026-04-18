@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ settings.theme if settings else 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Toolkit.uno{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block css %}{% endblock %}
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    {% block js_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('www.index') }}" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Toolkit.uno" height="40">
+            </a>
+
+            <div class="navbar-menu">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('account.profile') }}" class="nav-item">
+                        <img src="{{ current_user.avatar_url or url_for('static', filename='images/avatar-default.png') }}"
+                             alt="{{ current_user.username }}" class="avatar">
+                        {{ current_user.display_name }}
+                    </a>
+                    <a href="{{ url_for('notice.index') }}" class="nav-item">
+                        Notifications
+                        {% if notifications_count %}
+                            <span class="badge">{{ notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{{ url_for('contacts.index') }}" class="nav-item">Contacts</a>
+                    <a href="{{ url_for('chat.index') }}" class="nav-item">Chat</a>
+                    <a href="{{ url_for('settings.index') }}" class="nav-item">Settings</a>
+                    <a href="{{ url_for('account.logout') }}" class="nav-item">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('account.login') }}" class="nav-item">Login</a>
+                    <a href="{{ url_for('account.register') }}" class="nav-item">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Toolkit.uno</h4>
+                    <p>Your personal ecosystem for productivity and communication.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('www.about') }}">About</a></li>
+                        <li><a href="{{ url_for('www.features') }}">Features</a></li>
+                        <li><a href="{{ url_for('www.contact') }}">Contact</a></li>
+                        <li><a href="{{ url_for('www.status') }}">Status</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ now.year }} Toolkit.uno. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript at end of body -->
+    {% block js_body %}{% endblock %}
+
+    <!-- SocketIO (if needed) -->
+    {% if current_user.is_authenticated %}
+        <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
+        <script>
+            const socket = io();
+
+            // Global socket event handlers
+            socket.on('connect', function() {
+                console.log('Connected to server');
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Disconnected from server');
+            });
+        </script>
+    {% endif %}
+</body>
+</html>
